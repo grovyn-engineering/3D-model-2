@@ -1,69 +1,44 @@
-# React + TypeScript + Vite
+# 3D Sales Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A single-page data visualization widget that renders monthly sales as a 3D bar chart.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+| Tool | Role |
+|---|---|
+| React 19 + TypeScript | UI framework |
+| Three.js | 3D rendering and scene management |
+| Tailwind CSS v4 | Utility styling |
+| Vite | Build tool and dev server |
+| clsx + tailwind-merge | Class name utilities |
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **3D bar chart** — 12 monthly bars rendered with Three.js, pivoted at the base
+- **Load animation** — bars rise upward with a staggered `easeOutCubic` effect
+- **Auto-rotate** — scene rotates slowly on idle; pauses on interaction, resumes after 3s
+- **Orbit controls** — drag to rotate, scroll to zoom, with angle/distance limits
+- **Hover highlight** — hovered bar darkens and smoothly swells on XZ via `lerp`
+- **Tooltip** — shows month name and exact value on hover
+- **Stat cards** — total revenue, monthly average, and peak month derived from the dataset
+- **Responsive** — canvas resizes via `ResizeObserver`; mobile-friendly layout
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Structure
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── components/
+│   └── BarChart3D.tsx   # Three.js scene, controls, animation, raycaster
+├── lib/
+│   └── utils.ts         # cn() helper
+├── App.tsx              # Layout, stat cards, widget shell
+├── index.css            # Tailwind import + CSS variables (B&W matte theme)
+└── main.tsx             # Entry point
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Running
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
