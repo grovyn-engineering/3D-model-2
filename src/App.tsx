@@ -14,7 +14,6 @@ export default function App() {
     <div
       className="paper-texture min-h-screen flex flex-col items-center py-8 px-4 md:px-8"
     >
-      {/* ── Header ── */}
       <header className="w-full max-w-5xl mb-6">
         <div className="flex items-baseline gap-3 mb-1">
           <span
@@ -37,14 +36,12 @@ export default function App() {
           Full year overview · Hover bars for details
         </p>
 
-        {/* Divider */}
         <div
           className="mt-4 h-px w-full"
           style={{ background: 'var(--border)' }}
         />
       </header>
 
-      {/* ── Stat Cards ── */}
       <div className="w-full max-w-5xl grid grid-cols-3 gap-3 mb-6">
         {[
           { label: 'Total Revenue', value: formatCurrency(total), sub: 'FY 2024' },
@@ -74,9 +71,7 @@ export default function App() {
         ))}
       </div>
 
-      {/* ── 3D Chart Widget ── */}
       <div className="w-full max-w-5xl card-paper rounded-sm overflow-hidden">
-        {/* Widget header */}
         <div
           className="flex items-center justify-between px-5 py-3 border-b"
           style={{ borderColor: 'var(--border)' }}
@@ -101,12 +96,10 @@ export default function App() {
           </span>
         </div>
 
-        {/* Canvas area */}
         <div style={{ height: 'clamp(320px, 52vw, 520px)' }}>
           <BarChart3D />
         </div>
 
-        {/* Legend */}
         <div
           className="flex items-center gap-4 px-5 py-3 border-t"
           style={{ borderColor: 'var(--border)' }}
@@ -132,7 +125,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* ── Footer ── */}
       <footer className="w-full max-w-5xl mt-8 flex items-center justify-between">
         <div
           className="h-px flex-1"

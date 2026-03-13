@@ -54,18 +54,15 @@ export default function BarChart3D() {
     const mount = mountRef.current
     if (!mount) return
 
-    // ── Scene ──────────────────────────────────────────────
     const scene = new THREE.Scene()
     scene.background = new THREE.Color(0xf7f7f7)
 
-    // ── Camera ─────────────────────────────────────────────
     const w = mount.clientWidth
     const h = mount.clientHeight
     const camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 100)
     camera.position.set(0, 5, 14)
     camera.lookAt(0, 2, 0)
 
-    // ── Renderer ───────────────────────────────────────────
     const renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(w, h)
@@ -73,22 +70,19 @@ export default function BarChart3D() {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
     mount.appendChild(renderer.domElement)
 
-    // ── OrbitControls ──────────────────────────────────────
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.target.set(0, 2, 0)
     controls.enableDamping     = true
     controls.dampingFactor     = 0.08
     controls.autoRotate        = true
     controls.autoRotateSpeed   = 0.6
-    // Constrain so the chart never flips or goes underground
-    controls.minPolarAngle     = Math.PI / 6      // 30° — can't look straight down
-    controls.maxPolarAngle     = Math.PI / 2.2    // ~82° — can't go below floor
+    controls.minPolarAngle     = Math.PI / 6
+    controls.maxPolarAngle     = Math.PI / 2.2
     controls.minDistance       = 8
     controls.maxDistance       = 22
     controls.enablePan         = false
     controls.update()
 
-    // Pause auto-rotate while user is dragging; resume after 3 s of idle
     let idleTimer: ReturnType<typeof setTimeout> | null = null
     const pauseAutoRotate = () => {
       controls.autoRotate = false
@@ -97,7 +91,6 @@ export default function BarChart3D() {
     }
     renderer.domElement.addEventListener('pointerdown', pauseAutoRotate)
 
-    // ── Lights ─────────────────────────────────────────────
     const ambient = new THREE.AmbientLight(0xffffff, 1.2)
     scene.add(ambient)
 
@@ -117,7 +110,6 @@ export default function BarChart3D() {
     fillLight.position.set(-5, 3, -3)
     scene.add(fillLight)
 
-    // ── Floor ──────────────────────────────────────────────
     const floorGeo = new THREE.PlaneGeometry(20, 14)
     const floorMat = new THREE.MeshLambertMaterial({ color: 0xefefef })
     const floor    = new THREE.Mesh(floorGeo, floorMat)
@@ -135,7 +127,6 @@ export default function BarChart3D() {
     gridHelper.position.y = 0.001
     scene.add(gridHelper)
 
-    // ── Bars ───────────────────────────────────────────────
     const totalWidth = (SALES_DATA.length - 1) * BAR_GAP
 
     type BarEntry = {
@@ -144,7 +135,6 @@ export default function BarChart3D() {
       data: DataPoint
       normalMat: THREE.MeshLambertMaterial
       hoverMat: THREE.MeshLambertMaterial
-      // current XZ scale for smooth hover swell
       currentXZ: number
       targetXZ: number
     }
@@ -154,7 +144,7 @@ export default function BarChart3D() {
     SALES_DATA.forEach((d, i) => {
       const targetH = (d.value / MAX_VAL) * MAX_HEIGHT
       const geo = new THREE.BoxGeometry(BAR_WIDTH, 1, BAR_WIDTH)
-      geo.translate(0, 0.5, 0)   // pivot at bottom
+      geo.translate(0, 0.5, 0)
 
       const normalMat = new THREE.MeshLambertMaterial({ color: 0x2a2a2a })
       const hoverMat  = new THREE.MeshLambertMaterial({ color: 0x080808 })
@@ -171,7 +161,6 @@ export default function BarChart3D() {
       bars.push({ mesh, targetHeight: targetH, data: d, normalMat, hoverMat, currentXZ: 1, targetXZ: 1 })
     })
 
-    // ── Raycaster ──────────────────────────────────────────
     const raycaster = new THREE.Raycaster()
     const pointer   = new THREE.Vector2(-9999, -9999)
     let hoveredIndex = -1
@@ -188,14 +177,13 @@ export default function BarChart3D() {
         const idx = (hits[0].object as THREE.Mesh).userData.index as number
 
         if (idx !== hoveredIndex) {
-          // restore previous
           if (hoveredIndex >= 0) {
             bars[hoveredIndex].mesh.material = bars[hoveredIndex].normalMat
             bars[hoveredIndex].targetXZ = 1
           }
           hoveredIndex = idx
           bars[idx].mesh.material = bars[idx].hoverMat
-          bars[idx].targetXZ = 1.18   // swell 18% on XZ
+          bars[idx].targetXZ = 1.18
           mount.style.cursor = 'pointer'
         }
 
@@ -229,7 +217,6 @@ export default function BarChart3D() {
     mount.addEventListener('mousemove', onMouseMove)
     mount.addEventListener('mouseleave', onMouseLeave)
 
-    // ── Animation loop ─────────────────────────────────────
     const START_DELAY = 0.3
     const DURATION    = 1.4
     let startTime: number | null = null
@@ -242,24 +229,21 @@ export default function BarChart3D() {
       const elapsed = (time - startTime) / 1000
 
       bars.forEach((b, i) => {
-        // Rise animation
         const barDelay = START_DELAY + (i / bars.length) * 0.5
         const t        = Math.min(Math.max((elapsed - barDelay) / DURATION, 0), 1)
         const eased    = easeOutCubic(t)
         b.mesh.scale.y = Math.max(eased * b.targetHeight, 0.001)
 
-        // Smooth XZ swell on hover
         b.currentXZ = lerp(b.currentXZ, b.targetXZ, 0.12)
         b.mesh.scale.x = b.currentXZ
         b.mesh.scale.z = b.currentXZ
       })
 
-      controls.update()           // needed for damping + auto-rotate
+      controls.update()
       renderer.render(scene, camera)
     }
     rafId = requestAnimationFrame(animate)
 
-    // ── Resize ─────────────────────────────────────────────
     const onResize = () => {
       if (!mount) return
       const nw = mount.clientWidth
@@ -271,7 +255,6 @@ export default function BarChart3D() {
     const resizeObserver = new ResizeObserver(onResize)
     resizeObserver.observe(mount)
 
-    // ── Cleanup ────────────────────────────────────────────
     return () => {
       cancelAnimationFrame(rafId)
       if (idleTimer) clearTimeout(idleTimer)
@@ -294,7 +277,6 @@ export default function BarChart3D() {
     <div className="relative w-full h-full">
       <div ref={mountRef} className="w-full h-full" />
 
-      {/* Hint */}
       <div
         className="absolute top-3 right-4 pointer-events-none"
       >
@@ -306,7 +288,6 @@ export default function BarChart3D() {
         </span>
       </div>
 
-      {/* Month labels */}
       <div
         className="absolute bottom-0 left-0 right-0 flex justify-around pb-1 pointer-events-none"
         style={{ paddingLeft: '3%', paddingRight: '3%' }}
@@ -322,7 +303,6 @@ export default function BarChart3D() {
         ))}
       </div>
 
-      {/* Tooltip */}
       {tooltip.visible && tooltip.data && (
         <div
           className="absolute pointer-events-none z-20 card-paper rounded px-3 py-2"
