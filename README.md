@@ -34,12 +34,7 @@ A stunning, premium 3D dashboard widget that visualizes monthly sales data as an
 
 ## Installation
 
-1. **Clone or navigate to the project directory:**
-```bash
-cd Internship_Task
-```
-
-2. **Install dependencies:**
+**Install dependencies:**
 ```bash
 npm install
 ```
