@@ -1,4 +1,4 @@
-# 3D Dashboard Widget - Premium Sales Analytics
+# 3D Dashboard Widget 
 
 A stunning, premium 3D dashboard widget that visualizes monthly sales data as an interactive 3D bar chart. Built with React Three Fiber, featuring smooth animations, hover effects, and professional styling.
 
